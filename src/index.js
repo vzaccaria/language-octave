@@ -12,8 +12,8 @@ var rejectUndefined = $.leafs({
 })
 
 var skipComments = $.skip([
-  '"%".*$',
-  '"!".*$'
+  '%.*',
+  '!.*'
 ])
 
 var simpleTokens = $.leafs({
@@ -31,7 +31,7 @@ var skipSpaces = $.skip([
 ])
 
 var arrayOperators = $.leafs({
-  CR: $$.escapeRegExp('\\n'),
+  CR: '\\n',
   ARRAYMUL: $$.escapeRegExp(".*"),
   ARRAYPOW: $$.escapeRegExp(".^"),
   ARRAYDIV: $$.escapeRegExp("./"),
