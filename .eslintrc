@@ -12,6 +12,9 @@
     "eol-last": false,
     "no-shadow": false,
     "strict": false,
-    "comma-spacing": false
+    "camelcase": false,
+    "comma-spacing": false,
+    "no-new": false,
+    "new-cap": false
   }
 }

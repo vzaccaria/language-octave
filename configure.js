@@ -24,6 +24,7 @@ generateProject(_ => {
       _.verb("./verbfile.js", "docs/*.md")
     })
     _.cmd("cp ./lib/index.js ./index.js")
+    _.cmd("DEBUG=* node ./lib/parser.js")
   })
 
   _.collect("test", _ => {

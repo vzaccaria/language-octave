@@ -8,7 +8,7 @@ var _ = require('lodash')
 
 var {
   lexInput
-} = require('..')
+} = require('./lexer')
 
 var check = function (ref) {
   var l = lexInput(ref[0])
