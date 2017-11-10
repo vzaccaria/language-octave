@@ -1,7 +1,24 @@
 var debug = require('debug')('lo:parser')
 var escodegen = require('escodegen')
-
+var _ = require('lodash')
 var gen = escodegen.generate
+var sweet = require('sweet.js')
+
+var unQ = (quoted) => gen(quoted)
+var Q = (string) => sweet.parse(string).body[0]
+
+
+
+function setMatrix(m, indexes, value) {
+  if (indexes.length === 0) {
+    return Q(`${(m)} = ${unQ(value)}`)
+  } else {
+    indexes = _.map(indexes, unQ).join(',')
+    return Q(`${(m)}.subset(math.index(${indexes}), ${unQ(value)})`)
+  }
+}
+
+
 
 module.exports = (parser) => {
 
@@ -9,44 +26,19 @@ module.exports = (parser) => {
 
   parser.yy = b
 
-  b.assignTarget = (name, indexes) => {
-    debug(`Found assign target, ${gen(name)}, ${gen(indexes)}`)
-    return {
-      assignTarget: {
-        name,
-        indexes
-      }
-    }
-  }
-
   b.dGenCode = (e) => {
+    debug(JSON.stringify(e, 0, 4))
     debug(escodegen.generate(e))
+    return e;
   }
 
-  b.extCallExpression = (name, args) => {
-    debug(`Received function call ${name} with args ${JSON.stringify(args)}`)
-    var ret = b.callExpression(b.identifier(name), args)
-    b.dGenCode(ret)
-    return ret
-  }
-
-  b.assign = (assignTarget, value) => {
-    debug(`Received assign target ${JSON.stringify(assignTarget)}`)
-    var parameters = [assignTarget].concat([value])
-    b.extCallExpression('massign', parameters)
+  b.assign = (identifier, indexes, value) => {
+    return setMatrix(identifier, indexes, value)
   }
 
   b.getArgs = (arg) => {
-    debug(`Getting arg ${arg}`)
     return arg
   }
-
-  b.arrayAccess = (name, indexes) => {
-    debug(`Received array access to ${name}, indexes ${JSON.stringify(indexes)}`)
-    /** Use computed = true (3rd argument) to make it appear like an array assignment */
-    return b.memberExpression(b.identifier(name), (indexes), true)
-  }
-
 
   return parser
 }

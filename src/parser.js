@@ -54,8 +54,10 @@ var grammar = {
   ],
 
   index_expression: [
+    o('expression : expression : expression'),
+    o('expression : expression'),
+    o('expression'),
     o(':', () => literal('__M_ALL__')),
-    o('expression')
   ],
 
   index_expression_list: [
@@ -64,7 +66,7 @@ var grammar = {
   ],
 
   array_expression: [
-    o('IDENTIFIER ( index_expression_list )', () => arrayAccess($1, $3))
+    o('IDENTIFIER ( index_expression_list )')
   ],
 
   unary_expression: [
@@ -122,13 +124,14 @@ var grammar = {
 
   expression: [
     o('or_expression'),
-    o('expression : or_expression'),
     o('( expression )', () => getArgs($2))
   ],
 
 
   assignment_expression: [
-    o('postfix_expression = expression', () => assign($1, $3))
+    o('IDENTIFIER = expression', () => assign($1, [], $3)),
+    o('IDENTIFIER ( index_expression ) = expression', () => assign($1, [$3], $6)),
+    o('IDENTIFIER ( index_expression , index_expression ) = expression', () => assign($1, [$3, $5], $8))
   ],
 
   eostmt: [
@@ -173,7 +176,7 @@ var grammar = {
   ],
 
   assignment_statement: [
-    o('assignment_expression eostmt')
+    o('assignment_expression eostmt', () => dGenCode($1))
   ],
 
   array_element: [
@@ -247,8 +250,6 @@ var parserConfig = {
 
 var parser = new Parser(parserConfig)
 
-console.log(JSON.stringify(parserConfig, 0, 4))
-
 
 parser = require('./nodes')(parser)
 
@@ -256,7 +257,7 @@ parser = require('./nodes')(parser)
 
 
 var test = `
-a(0)=1
+a(3,1)=c
 `
 
 
